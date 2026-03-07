@@ -2,7 +2,7 @@ import { type Tab } from '../../hooks/use-tab';
 import type { SessionStatus } from '../../types/session';
 import { cn } from '../../lib/cn';
 
-const NAV_ITEMS: { tab: Tab; label: string }[] = [
+const SESSION_ITEMS: { tab: Tab; label: string }[] = [
   { tab: 'table', label: 'Table' },
   { tab: 'leaderboard', label: 'Leaderboard' },
   { tab: 'settlement', label: 'Settle' },
@@ -17,7 +17,9 @@ interface SidebarProps {
 }
 
 export function Sidebar({ tab, setTab, status, sessionName }: SidebarProps) {
-  if (status === 'setup') return null;
+  const navItems = status === 'setup'
+    ? [{ tab: 'eval' as Tab, label: 'Hand Eval' }]
+    : [...SESSION_ITEMS, { tab: 'eval' as Tab, label: 'Hand Eval' }];
   return (
     <aside
       className="hidden md:flex flex-col fixed inset-y-0 left-0 w-56 border-r border-white/10 z-40"
@@ -30,7 +32,7 @@ export function Sidebar({ tab, setTab, status, sessionName }: SidebarProps) {
         )}
       </div>
       <nav className="flex flex-col gap-1 px-2">
-        {NAV_ITEMS.map(({ tab: t, label }) => (
+        {navItems.map(({ tab: t, label }) => (
           <button
             key={t}
             type="button"

@@ -16,6 +16,18 @@ interface TabDef {
   icon: React.ReactNode;
 }
 
+const EVAL_TAB: TabDef = {
+  id: 'eval',
+  label: 'Eval',
+  icon: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="2" y="3" width="7" height="10" rx="1" />
+      <rect x="15" y="3" width="7" height="10" rx="1" />
+      <path d="M12 8v8M9 19h6" />
+    </svg>
+  ),
+};
+
 const ACTIVE_TABS: TabDef[] = [
   {
     id: 'table',
@@ -62,7 +74,7 @@ const SETUP_TAB: TabDef = {
 };
 
 export function TabBar({ tab, setTab, status }: TabBarProps) {
-  const tabs = status === 'setup' ? [SETUP_TAB] : ACTIVE_TABS;
+  const tabs = status === 'setup' ? [SETUP_TAB, EVAL_TAB] : [...ACTIVE_TABS, EVAL_TAB];
 
   return (
     <nav

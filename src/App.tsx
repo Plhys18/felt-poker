@@ -12,6 +12,7 @@ import { TableView } from './components/table/TableView';
 import { LeaderboardView } from './components/leaderboard/LeaderboardView';
 import { SettlementView } from './components/settlement/SettlementView';
 import { HistoryView } from './components/history/HistoryView';
+import { HandEvalView } from './components/eval/HandEvalView';
 import { ReadOnlyView } from './components/ReadOnlyView';
 import { LiveSpectatorView } from './components/LiveSpectatorView';
 
@@ -63,6 +64,7 @@ export default function App() {
   if (SHARE_ENCODED) return <ReadOnlyView encoded={SHARE_ENCODED} />;
 
   const renderView = () => {
+    if (tab === 'eval') return <HandEvalView />;
     if (status === 'setup') return <SetupView setTab={setTab} />;
     switch (tab) {
       case 'table':
@@ -84,14 +86,12 @@ export default function App() {
         <Header sessionName={config?.name ?? null} status={status} spectatorCount={spectatorCount} />
       </div>
       <Sidebar tab={tab} setTab={setTab} status={status} sessionName={config?.name ?? null} />
-      <main className={`flex-1 overflow-y-auto pt-16 md:pt-6 pb-20 md:pb-6 px-3 md:px-6${status !== 'setup' ? ' md:ml-56' : ''}`}>
+      <main className="flex-1 overflow-y-auto pt-16 md:pt-6 pb-20 md:pb-6 px-3 md:px-6 md:ml-56">
         {renderView()}
       </main>
-      {status !== 'setup' && (
-        <div className="md:hidden">
-          <TabBar tab={tab} setTab={setTab} status={status} />
-        </div>
-      )}
+      <div className="md:hidden">
+        <TabBar tab={tab} setTab={setTab} status={status} />
+      </div>
     </div>
   );
 }
