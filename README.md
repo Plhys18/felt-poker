@@ -342,8 +342,26 @@ All tabs on the same origin share a `BroadcastChannel` named `felt:session`. The
 2. Create a feature branch (`git checkout -b feature/my-change`).
 3. Make your changes. The `engine/` layer should remain pure functions with no React imports.
 4. Add tests for new logic in `tests/`.
-5. Run `npm run lint && npm run test:run` to verify.
+5. Run the full pre-push checklist (see below) to verify.
 6. Open a pull request.
+
+### Pre-commit / pre-push checklist
+
+**Always run these locally before committing or pushing.** The CI deploy will fail if any of them error.
+
+```bash
+npm run build      # must complete with zero errors and zero warnings
+npm run test:run   # all tests must pass (92 tests)
+npm run lint       # no ESLint errors
+```
+
+`npm run build` runs `tsc -b` (strict TypeScript, `noUnusedLocals`, exhaustive switch checks) followed by Vite. Common things it catches that a dev server won't:
+
+- Unused types or variables (e.g. a dead `type Foo = ...` declaration)
+- Missing cases in exhaustive switch statements over union types (the `default: never` pattern)
+- Import/export mismatches that HMR silently tolerates
+
+If the build fails locally, fix it before pushing — the GitHub Pages deploy runs the same build step and will fail identically.
 
 ---
 
