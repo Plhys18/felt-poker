@@ -9,6 +9,7 @@ export type {
   CashOutEvent,
   RejoinEvent,
   SessionSettledEvent,
+  PlayerRenamedEvent,
   GameEvent,
 } from './events';
 

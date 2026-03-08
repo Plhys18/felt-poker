@@ -83,6 +83,14 @@ export function projectSession(session: Session): SessionProjection {
         // no-op for projection (transfers recorded on event)
         break;
 
+      case 'PLAYER_RENAMED': {
+        const ps = stateMap.get(event.playerId);
+        if (ps) {
+          ps.name = event.newName;
+        }
+        break;
+      }
+
       default: {
         // exhaustive check
         const _exhaustive: never = event;

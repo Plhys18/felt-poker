@@ -40,10 +40,17 @@ export interface SessionSettledEvent extends BaseEvent {
   readonly transfers: readonly Transfer[];
 }
 
+export interface PlayerRenamedEvent extends BaseEvent {
+  readonly type: 'PLAYER_RENAMED';
+  readonly playerId: PlayerId;
+  readonly newName: string;
+}
+
 export type GameEvent =
   | GameStartedEvent
   | BuyInEvent
   | StackUpdateEvent
   | CashOutEvent
   | RejoinEvent
-  | SessionSettledEvent;
+  | SessionSettledEvent
+  | PlayerRenamedEvent;
