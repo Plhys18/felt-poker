@@ -6,7 +6,7 @@ export function makeConfig(overrides?: Partial<SessionConfig>): SessionConfig {
   return {
     id: newSessionId(),
     name: 'Test Session',
-    defaultBuyIn: 20,
+    defaultBuyIn: 0,
     createdAt: Date.now(),
     ...overrides,
   };

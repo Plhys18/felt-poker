@@ -6,8 +6,10 @@ import type {
   GameEvent,
   SessionProjection,
   SessionSettledEvent,
+  PlayerRenamedEvent,
 } from '../types';
 import type { SessionId } from '../types';
+import type { PlayerId } from '../types';
 import { newEventId, newPlayerId } from '../types';
 import { CURRENT_SCHEMA_VERSION } from '../persistence/constants';
 import {
@@ -34,6 +36,12 @@ export interface SessionStore {
   resetSession: () => void;
   loadFromStorage: () => void;
   dismissHistory: (sessionId: SessionId) => void;
+  /** Wipe all session history. */
+  clearHistory: () => void;
+  /** Remove the last event from the session (cannot undo past GAME_STARTED). */
+  undoLastEvent: () => void;
+  /** Rename a player mid-game by appending a PLAYER_RENAMED event. */
+  renamePlayer: (playerId: PlayerId, newName: string) => void;
   /** Mirror state received from a sibling tab without re-broadcasting. */
   syncFromBroadcast: (state: Pick<SessionStore, 'currentSession' | 'projection' | 'history'>) => void;
 }
@@ -49,11 +57,21 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
       type: 'GAME_STARTED',
       timestamp: Date.now(),
     };
+    // Issue initial buy-in for each player (only when a buy-in amount is set)
+    const buyInEvents: GameEvent[] = config.defaultBuyIn > 0
+      ? players.map((p) => ({
+          id: newEventId(),
+          type: 'BUY_IN' as const,
+          timestamp: Date.now(),
+          playerId: p.id,
+          chipsReceived: config.defaultBuyIn,
+        }))
+      : [];
     const session: Session = {
       schemaVersion: CURRENT_SCHEMA_VERSION,
       config,
       players,
-      events: [gameStartedEvent],
+      events: [gameStartedEvent, ...buyInEvents],
       status: 'active',
       endedAt: null,
     };
@@ -152,6 +170,46 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     const newHistory = history.filter((s) => s.config.id !== sessionId);
     persistHistory(newHistory);
     set({ history: newHistory });
+  },
+
+  clearHistory: () => {
+    persistHistory([]);
+    set({ history: [] });
+  },
+
+  undoLastEvent: () => {
+    const { currentSession } = get();
+    if (!currentSession || currentSession.status === 'settled') return;
+    // Never undo past the initial GAME_STARTED event
+    if (currentSession.events.length <= 1) return;
+    const updated: Session = {
+      ...currentSession,
+      events: currentSession.events.slice(0, -1),
+    };
+    const projection = projectSession(updated);
+    persistCurrentSession(updated);
+    set({ currentSession: updated, projection });
+  },
+
+  renamePlayer: (playerId, newName) => {
+    const { currentSession } = get();
+    if (!currentSession || currentSession.status !== 'active') return;
+    const trimmed = newName.trim();
+    if (!trimmed) return;
+    const event: PlayerRenamedEvent = {
+      id: newEventId(),
+      type: 'PLAYER_RENAMED',
+      timestamp: Date.now(),
+      playerId,
+      newName: trimmed,
+    };
+    const updated: Session = {
+      ...currentSession,
+      events: [...currentSession.events, event],
+    };
+    const projection = projectSession(updated);
+    persistCurrentSession(updated);
+    set({ currentSession: updated, projection });
   },
 
   syncFromBroadcast: (state) => {
