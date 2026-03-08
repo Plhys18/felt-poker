@@ -7,6 +7,7 @@ const SESSION_ITEMS: { tab: Tab; label: string }[] = [
   { tab: 'leaderboard', label: 'Leaderboard' },
   { tab: 'settlement', label: 'Settle' },
   { tab: 'history', label: 'History' },
+  { tab: 'stats', label: 'Stats' },
 ];
 
 interface SidebarProps {

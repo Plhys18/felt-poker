@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export type Tab = 'setup' | 'table' | 'leaderboard' | 'settlement' | 'history' | 'eval';
+export type Tab = 'setup' | 'table' | 'leaderboard' | 'settlement' | 'history' | 'eval' | 'stats';
 
 export function useTab(): {
   tab: Tab;

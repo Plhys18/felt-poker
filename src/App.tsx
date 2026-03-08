@@ -13,6 +13,7 @@ import { LeaderboardView } from './components/leaderboard/LeaderboardView';
 import { SettlementView } from './components/settlement/SettlementView';
 import { HistoryView } from './components/history/HistoryView';
 import { HandEvalView } from './components/eval/HandEvalView';
+import { StatsView } from './components/stats/StatsView';
 import { ReadOnlyView } from './components/ReadOnlyView';
 import { LiveSpectatorView } from './components/LiveSpectatorView';
 
@@ -75,6 +76,8 @@ export default function App() {
         return <SettlementView setTab={setTab} />;
       case 'history':
         return <HistoryView />;
+      case 'stats':
+        return <StatsView />;
       default:
         return <TableView setTab={setTab} />;
     }
