@@ -132,3 +132,27 @@ export const ALL_CARDS: Card[] = SUITS.flatMap(suit =>
 );
 
 export function cardKey(c: Card): string { return `${c.rank}${c.suit}`; }
+
+/** Given 7 cards, return the best 5-card HandResult (tries all C(7,5)=21 combos). */
+export function bestFiveOf7(cards: Card[]): HandResult {
+  if (cards.length !== 7) throw new Error('Need exactly 7 cards');
+  let best: HandResult | null = null;
+  for (let i = 0; i < 7; i++) {
+    for (let j = i + 1; j < 7; j++) {
+      // Pick all 5 cards except indices i and j
+      const five = cards.filter((_, k) => k !== i && k !== j);
+      const result = evaluateHand(five);
+      if (!best || result.score > best.score) best = result;
+    }
+  }
+  return best!;
+}
+
+/** Compare two 7-card hands (e.g. 2 hole cards + 5 board). */
+export function compareSevenCardHands(left: Card[], right: Card[]): CompareResult {
+  const l = bestFiveOf7(left);
+  const r = bestFiveOf7(right);
+  if (l.score > r.score) return 'left';
+  if (r.score > l.score) return 'right';
+  return 'tie';
+}
