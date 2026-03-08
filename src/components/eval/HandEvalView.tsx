@@ -15,11 +15,6 @@ import { CardPicker } from './CardPicker';
 // Types
 // ---------------------------------------------------------------------------
 
-type PickerTarget =
-  | { zone: 'left'; index: number }
-  | { zone: 'right'; index: number }
-  | { zone: 'board'; index: number };
-
 // ---------------------------------------------------------------------------
 // CardDisplay — empty slot or filled card button
 // ---------------------------------------------------------------------------

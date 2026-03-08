@@ -37,6 +37,10 @@ function formatEvent(
     }
     case 'SESSION_SETTLED':
       return 'Session settled';
+    case 'PLAYER_RENAMED': {
+      const name = playerNames[event.playerId] ?? 'Unknown';
+      return `${name} renamed to ${event.newName}`;
+    }
     default: {
       const _exhaustive: never = event;
       void _exhaustive;
@@ -59,6 +63,8 @@ function eventEmoji(event: GameEvent): string {
       return '\u21A9\uFE0F';
     case 'SESSION_SETTLED':
       return '\u2705';
+    case 'PLAYER_RENAMED':
+      return '\u270F\uFE0F';
     default: {
       const _exhaustive: never = event;
       void _exhaustive;
