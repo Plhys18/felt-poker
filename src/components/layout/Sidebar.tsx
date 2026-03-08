@@ -19,7 +19,7 @@ interface SidebarProps {
 
 export function Sidebar({ tab, setTab, status, sessionName }: SidebarProps) {
   const navItems = status === 'setup'
-    ? [{ tab: 'eval' as Tab, label: 'Hand Eval' }]
+    ? [{ tab: 'setup' as Tab, label: 'Setup' }, { tab: 'eval' as Tab, label: 'Hand Eval' }]
     : [...SESSION_ITEMS, { tab: 'eval' as Tab, label: 'Hand Eval' }];
   return (
     <aside
