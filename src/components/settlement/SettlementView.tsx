@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useSettlement } from '../../hooks/use-settlement';
 import { useSession } from '../../hooks/use-session';
@@ -7,6 +8,7 @@ import type { Tab } from '../../hooks/use-tab';
 import type { PlayerId } from '../../types/ids';
 import { formatChips } from '../../engine/currency';
 import { formatDate, formatDuration } from '../../lib/format';
+import { exportSessionCSV, exportSessionJSON } from '../../lib/export';
 import { Button } from '../ui/Button';
 import { TransferCard } from './TransferCard';
 import { ShareButton } from './ShareButton';
@@ -38,6 +40,8 @@ export function SettlementView({ setTab }: SettlementViewProps) {
   const totalPot = useSessionStore(selectTotalPot);
   const currentSession = useSessionStore(selectCurrentSession);
 
+  const [paidSet, setPaidSet] = useState<Set<number>>(new Set());
+
   if (!config || !settlement) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -61,6 +65,22 @@ export function SettlementView({ setTab }: SettlementViewProps) {
     resetSession();
     setTab('setup');
   }
+
+  function handleTogglePaid(i: number) {
+    setPaidSet((prev) => {
+      const next = new Set(prev);
+      if (next.has(i)) {
+        next.delete(i);
+      } else {
+        next.add(i);
+      }
+      return next;
+    });
+  }
+
+  const totalTransfers = settlement.transfers.length;
+  const paidCount = paidSet.size;
+  const allPaid = totalTransfers > 0 && paidCount === totalTransfers;
 
   return (
     <div>
@@ -97,12 +117,28 @@ export function SettlementView({ setTab }: SettlementViewProps) {
 
         {/* Transfers */}
         <div className="space-y-2">
-          <h3 className="text-white/60 text-xs font-semibold uppercase tracking-wide px-1">
-            Payouts &mdash;{' '}
-            {settlement.transfers.length} transfer
-            {settlement.transfers.length !== 1 ? 's' : ''}
-          </h3>
-          {settlement.transfers.length === 0 ? (
+          <div className="flex items-center justify-between px-1">
+            <h3 className="text-white/60 text-xs font-semibold uppercase tracking-wide">
+              Payouts &mdash;{' '}
+              {totalTransfers} transfer
+              {totalTransfers !== 1 ? 's' : ''}
+            </h3>
+            {paidCount > 0 && !allPaid && (
+              <span className="text-gold text-xs font-semibold">
+                {paidCount} / {totalTransfers} paid
+              </span>
+            )}
+          </div>
+
+          {allPaid && (
+            <div className="bg-profit/10 rounded-xl border border-profit/30 px-4 py-3 text-center">
+              <p className="text-profit font-semibold text-sm">
+                All settled up! 🎉
+              </p>
+            </div>
+          )}
+
+          {totalTransfers === 0 ? (
             <div className="bg-white/5 rounded-xl border border-white/10 px-4 py-5 text-center">
               <p className="text-profit font-semibold">
                 All square! No transfers needed.
@@ -114,6 +150,8 @@ export function SettlementView({ setTab }: SettlementViewProps) {
                 key={i}
                 transfer={transfer}
                 playerNames={playerNames}
+                isPaid={paidSet.has(i)}
+                onToggle={() => handleTogglePaid(i)}
               />
             ))
           )}
@@ -122,6 +160,26 @@ export function SettlementView({ setTab }: SettlementViewProps) {
         {/* Actions */}
         <div className="space-y-2 pt-2">
           <ShareButton />
+          {currentSession !== null && (
+            <div className="flex gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                fullWidth
+                onClick={() => exportSessionCSV(currentSession)}
+              >
+                Export CSV
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                fullWidth
+                onClick={() => exportSessionJSON(currentSession)}
+              >
+                Export JSON
+              </Button>
+            </div>
+          )}
           <Button variant="primary" size="lg" fullWidth onClick={handleNewGame}>
             New Game
           </Button>
