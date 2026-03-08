@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import type { PlayerState } from '../../types/projection';
 import { cn } from '../../lib/cn';
 import { formatChips } from '../../engine/currency';
@@ -8,11 +8,30 @@ import { CurrencyDisplay } from '../ui/CurrencyDisplay';
 interface LeaderboardRowProps {
   player: PlayerState;
   rank: number;
+  prevRank?: number;
 }
 
-export const LeaderboardRow = memo(function LeaderboardRow({ player, rank }: LeaderboardRowProps) {
+export const LeaderboardRow = memo(function LeaderboardRow({ player, rank, prevRank }: LeaderboardRowProps) {
   const isFirst = rank === 1;
   const isCashedOut = player.status === 'cashed_out';
+
+  const [animClass, setAnimClass] = useState<string>('');
+  // Track the previous rank between renders using a ref so effect can compare
+  const prevRankRef = useRef<number | undefined>(prevRank);
+
+  useEffect(() => {
+    const prev = prevRankRef.current;
+    prevRankRef.current = rank;
+
+    // Skip animation on the very first mount (prev === undefined)
+    if (prev === undefined || prev === rank) return;
+
+    const cls = rank < prev ? 'animate-rank-up' : 'animate-rank-down';
+    setAnimClass(cls);
+
+    const id = setTimeout(() => setAnimClass(''), 400);
+    return () => clearTimeout(id);
+  }, [rank]);
 
   return (
     <div
@@ -20,6 +39,7 @@ export const LeaderboardRow = memo(function LeaderboardRow({ player, rank }: Lea
         'flex items-center gap-3 px-4 py-3 border-b border-white/5 last:border-0 transition-colors',
         isFirst && 'bg-gradient-to-r from-gold/10 to-transparent',
         isCashedOut && 'opacity-50',
+        animClass,
       )}
     >
       {/* Rank */}
