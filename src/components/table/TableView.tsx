@@ -19,6 +19,12 @@ export function TableView({ setTab }: TableViewProps) {
   const { config } = useSession();
   const integrity = useIntegrity();
   const settleSession = useSessionStore((s) => s.settleSession);
+  const undoLastEvent = useSessionStore((s) => s.undoLastEvent);
+  const canUndo = useSessionStore(
+    (s) =>
+      s.currentSession?.status === 'active' &&
+      (s.currentSession?.events.length ?? 0) > 1,
+  );
 
   const playerIds = useSessionStore(
     useShallow((s) => s.projection?.playersByPosition.map((p) => p.id) ?? []),
@@ -55,6 +61,29 @@ export function TableView({ setTab }: TableViewProps) {
           <IntegrityBanner report={integrity} />
         )}
 
+        {/* Toolbar: Add Player + Undo */}
+        <div className="flex items-center justify-between gap-2">
+          <button
+            type="button"
+            onClick={() => setShowAddPlayer(true)}
+            className="flex flex-row items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-dashed border-white/20 text-white/50 hover:bg-white/10 hover:text-white/70 hover:border-white/40 transition-all text-sm font-semibold"
+          >
+            <span className="text-lg font-light leading-none">+</span>
+            <span>Add Player</span>
+          </button>
+          {canUndo && (
+            <button
+              type="button"
+              onClick={undoLastEvent}
+              title="Undo last action"
+              className="flex flex-row items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/40 hover:bg-white/10 hover:text-white/70 hover:border-white/30 transition-all text-sm font-semibold"
+            >
+              <span className="text-base leading-none">↩</span>
+              <span>Undo</span>
+            </button>
+          )}
+        </div>
+
         {/* Player grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 w-full">
           {playerIds.map((id) => (
@@ -64,14 +93,6 @@ export function TableView({ setTab }: TableViewProps) {
               defaultBuyIn={config.defaultBuyIn}
             />
           ))}
-          <button
-            type="button"
-            onClick={() => setShowAddPlayer(true)}
-            className="bg-white/5 border border-dashed border-white/20 rounded-2xl p-4 h-14 flex flex-row items-center justify-center gap-2 text-white/40 hover:bg-white/10 hover:text-white/70 hover:border-white/40 transition-all"
-          >
-            <span className="text-2xl font-light leading-none">+</span>
-            <span className="text-sm font-semibold">Add Player</span>
-          </button>
         </div>
 
         {/* Settle button */}
