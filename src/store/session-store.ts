@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { lastNightSession } from '../data/lastNightSession';
 import type {
   Session,
   SessionConfig,
@@ -44,6 +45,8 @@ export interface SessionStore {
   renamePlayer: (playerId: PlayerId, newName: string) => void;
   /** Mirror state received from a sibling tab without re-broadcasting. */
   syncFromBroadcast: (state: Pick<SessionStore, 'currentSession' | 'projection' | 'history'>) => void;
+  /** Load the built-in demo session into history (idempotent). */
+  loadDemoSession: () => void;
 }
 
 export const useSessionStore = create<SessionStore>((set, get) => ({
@@ -218,6 +221,14 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     _isSyncing = true;
     set(state);
     _isSyncing = false;
+  },
+
+  loadDemoSession: () => {
+    const { history } = get();
+    if (history.some(s => s.config.id === lastNightSession.config.id)) return;
+    const newHistory = [lastNightSession, ...history].slice(0, 50);
+    persistHistory(newHistory);
+    set({ history: newHistory });
   },
 }));
 

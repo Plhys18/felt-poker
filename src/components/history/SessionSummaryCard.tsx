@@ -11,9 +11,10 @@ import { useSessionStore } from '../../store/session-store';
 
 interface SessionSummaryCardProps {
   session: Session;
+  onSelect: (session: Session) => void;
 }
 
-export function SessionSummaryCard({ session }: SessionSummaryCardProps) {
+export function SessionSummaryCard({ session, onSelect }: SessionSummaryCardProps) {
   const dismissHistory = useSessionStore((s) => s.dismissHistory);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -35,7 +36,14 @@ export function SessionSummaryCard({ session }: SessionSummaryCardProps) {
 
   return (
     <>
-      <div className="bg-white/5 rounded-2xl border border-white/10 p-4 space-y-3">
+      <div
+        className="bg-white/5 rounded-2xl border border-white/10 p-4 space-y-3 cursor-pointer hover:bg-white/[0.08] hover:border-white/20 transition-all active:scale-[0.99]"
+        onClick={() => onSelect(session)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') onSelect(session); }}
+        aria-label={`View details for ${session.config.name}`}
+      >
         {/* Header */}
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
@@ -51,7 +59,7 @@ export function SessionSummaryCard({ session }: SessionSummaryCardProps) {
             </div>
             <button
               type="button"
-              onClick={() => setShowConfirm(true)}
+              onClick={e => { e.stopPropagation(); setShowConfirm(true); }}
               title="Delete session"
               className="text-white/20 hover:text-loss transition-colors p-0.5 mt-0.5"
               aria-label="Delete session"
