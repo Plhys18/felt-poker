@@ -19,8 +19,8 @@ interface SidebarProps {
 
 export function Sidebar({ tab, setTab, status, sessionName }: SidebarProps) {
   const navItems = status === 'setup'
-    ? [{ tab: 'setup' as Tab, label: 'Setup' }, { tab: 'eval' as Tab, label: 'Hand Eval' }]
-    : [...SESSION_ITEMS, { tab: 'eval' as Tab, label: 'Hand Eval' }];
+    ? [{ tab: 'setup' as Tab, label: 'Setup' }, { tab: 'eval' as Tab, label: 'Hand Eval' }, { tab: 'advisor' as Tab, label: 'AI Advisor' }]
+    : [...SESSION_ITEMS, { tab: 'eval' as Tab, label: 'Hand Eval' }, { tab: 'advisor' as Tab, label: 'AI Advisor' }];
   return (
     <aside
       className="hidden md:flex flex-col fixed inset-y-0 left-0 w-56 border-r border-white/10 z-40"

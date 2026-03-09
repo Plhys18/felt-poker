@@ -28,6 +28,19 @@ const EVAL_TAB: TabDef = {
   ),
 };
 
+const ADVISOR_TAB: TabDef = {
+  id: 'advisor',
+  label: 'AI',
+  icon: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 2a4 4 0 014 4v1h1a3 3 0 010 6h-1v1a4 4 0 01-8 0v-1H7a3 3 0 010-6h1V6a4 4 0 014-4z" />
+      <circle cx="9" cy="10" r="1" fill="currentColor" />
+      <circle cx="15" cy="10" r="1" fill="currentColor" />
+      <path d="M9 15c1 1 5 1 6 0" />
+    </svg>
+  ),
+};
+
 const ACTIVE_TABS: TabDef[] = [
   {
     id: 'table',
@@ -86,7 +99,7 @@ const SETUP_TAB: TabDef = {
 };
 
 export function TabBar({ tab, setTab, status }: TabBarProps) {
-  const tabs = status === 'setup' ? [SETUP_TAB, EVAL_TAB] : [...ACTIVE_TABS, EVAL_TAB];
+  const tabs = status === 'setup' ? [SETUP_TAB, EVAL_TAB, ADVISOR_TAB] : [...ACTIVE_TABS, EVAL_TAB, ADVISOR_TAB];
 
   return (
     <nav

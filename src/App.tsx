@@ -14,6 +14,7 @@ import { SettlementView } from './components/settlement/SettlementView';
 import { HistoryView } from './components/history/HistoryView';
 import { HandEvalView } from './components/eval/HandEvalView';
 import { StatsView } from './components/stats/StatsView';
+import { AdvisorView } from './components/advisor/AdvisorView';
 import { ReadOnlyView } from './components/ReadOnlyView';
 import { LiveSpectatorView } from './components/LiveSpectatorView';
 
@@ -66,6 +67,7 @@ export default function App() {
 
   const renderView = () => {
     if (tab === 'eval') return <HandEvalView />;
+    if (tab === 'advisor') return <AdvisorView />;
     if (status === 'setup') return <SetupView setTab={setTab} />;
     switch (tab) {
       case 'table':
